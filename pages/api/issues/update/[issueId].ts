@@ -13,17 +13,18 @@ export default async function updateIssue(
   }
 
   try {
-    // Validate the inputs.
+    // Validate the inputs & query.
     const body = req.body;
+    const issueId = req.query.issueId as string;
 
-    if (!body) {
+    if (!body || !issueId) {
       res.status(400).json({ data: null, error: "Bad Request" });
       return;
     }
 
     const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
 
-    if (!parsedBody.id || !parsedBody.title || !parsedBody.description) {
+    if (!parsedBody.title || !parsedBody.description) {
       res.status(400).json({ data: null, error: "Bad Request" });
       return;
     }
@@ -31,17 +32,9 @@ export default async function updateIssue(
     // Check if there's any data inside `issues.json`
     const rawIssues = await fs.readFile(`${rootDir}/issues.json`, "utf-8");
 
-    // If there's no data. Just add the data (like an upsert operation).
+    // If there's no data, return no data.
     if (rawIssues === "") {
-      await fs.writeFile(
-        `${rootDir}/issues.json`,
-        JSON.stringify([parsedBody], null, 2)
-      );
-
-      res.json({
-        data: { message: "Data Updated!", payload: parsedBody },
-        error: null,
-      });
+      res.status(404).json({ data: null, error: "Data not found." });
       return;
     }
 
@@ -64,22 +57,14 @@ export default async function updateIssue(
       );
 
       res.json({
-        data: { message: "Data Updated!", payload: parsedBody },
+        data: { message: "Data Updated!", payload: { issueId, ...parsedBody } },
         error: null,
       });
       return;
     }
 
-    // If data is not exist, just add the data (like an upsert operation).
-    await fs.writeFile(
-      `${rootDir}/issues.json`,
-      JSON.stringify([...issues, parsedBody], null, 2)
-    );
-
-    res.json({
-      data: { message: "Data Updated!", payload: parsedBody },
-      error: null,
-    });
+    // If data is not exist, return no data
+    res.status(404).json({ data: null, error: "Data not found." });
   } catch (e) {
     console.log(e);
 

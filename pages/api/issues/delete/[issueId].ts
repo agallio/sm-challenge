@@ -13,17 +13,10 @@ export default async function getIssues(
   }
 
   try {
-    // Validate the inputs.
-    const body = req.body;
+    // Validate the query.
+    const issueId = req.query.issueId as string;
 
-    if (!body) {
-      res.status(400).json({ data: null, error: "Bad Request" });
-      return;
-    }
-
-    const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
-
-    if (!parsedBody.id) {
+    if (!issueId) {
       res.status(400).json({ data: null, error: "Bad Request" });
       return;
     }
@@ -33,16 +26,16 @@ export default async function getIssues(
 
     // If there's no data, return no data.
     if (rawIssues === "") {
-      res.json({ data: null, error: "No data available" });
+      res.status(404).json({ data: null, error: "No data available" });
       return;
     }
 
     // If the data exists, delete the data.
     const issues = JSON.parse(rawIssues) as IssueData[];
 
-    const isIssueExist = issues.find((i) => i.id === parsedBody.id);
+    const isIssueExist = issues.find((i) => i.id === issueId);
     if (isIssueExist) {
-      const filteredIssues = issues.filter((i) => i.id !== parsedBody.id);
+      const filteredIssues = issues.filter((i) => i.id !== issueId);
 
       await fs.writeFile(
         `${rootDir}/issues.json`,
@@ -50,10 +43,13 @@ export default async function getIssues(
       );
 
       res.json({
-        data: { message: "Data Deleted!", payload: parsedBody },
+        data: { message: "Data Deleted!", payload: { issueId } },
         error: null,
       });
     }
+
+    // If the data is not exists, return no data.
+    res.status(404).json({ data: null, error: "No data available" });
   } catch (e) {
     console.log(e);
 

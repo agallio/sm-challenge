@@ -4,9 +4,13 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# clone this repository
+
+# install packages
+$ pnpm i
+
+# run the development server
 $ pnpm dev
 ```
 

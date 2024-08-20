@@ -41,11 +41,11 @@ export default async function updateIssue(
     // If the data exists, update the data.
     const issues = JSON.parse(rawIssues) as IssueData[];
 
-    const isIssueExist = issues.find((i) => i.id === parsedBody.id);
+    const isIssueExist = issues.find((i) => i.id === issueId);
     if (isIssueExist) {
       const updatedIssues = issues.map((i) => {
-        if (i.id === parsedBody.id) {
-          return parsedBody;
+        if (i.id === issueId) {
+          return { ...i, ...parsedBody };
         }
 
         return i;

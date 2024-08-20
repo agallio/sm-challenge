@@ -10,13 +10,11 @@ const allRequests = [
     method: "POST",
     path: "/api/issues/create",
     description: "Create a new issue.",
-    requestBody: JSON.stringify({ hello: "test" }, null, 2),
   },
   {
     method: "PUT",
-    path: "/api/issues/update",
+    path: "/api/issues/update/:issueId",
     description: "Update an existing issue.",
-    requestBody: JSON.stringify({ hello: "test" }, null, 2),
   },
   {
     method: "DELETE",
@@ -51,7 +49,6 @@ export default function Home() {
               method={request.method as MethodType}
               path={request.path}
               description={request.description}
-              requestBody={request.requestBody}
             />
           ))}
         </div>
